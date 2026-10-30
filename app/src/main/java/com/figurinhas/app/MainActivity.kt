@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputEditText
 import java.io.File
@@ -29,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var stickerAdapter: StickerAdapter
     private lateinit var packNameInput: TextInputEditText
     private lateinit var creatorInput: TextInputEditText
+    private lateinit var hideNameCheck: MaterialCheckBox
+    private lateinit var hideCreatorCheck: MaterialCheckBox
     private lateinit var countText: TextView
     private lateinit var emptyText: TextView
     private lateinit var progress: LinearProgressIndicator
@@ -53,6 +56,8 @@ class MainActivity : AppCompatActivity() {
 
         packNameInput = findViewById(R.id.packNameInput)
         creatorInput = findViewById(R.id.creatorInput)
+        hideNameCheck = findViewById(R.id.hidePackNameCheck)
+        hideCreatorCheck = findViewById(R.id.hideCreatorCheck)
         countText = findViewById(R.id.countText)
         emptyText = findViewById(R.id.emptyText)
         progress = findViewById(R.id.progress)
@@ -67,6 +72,12 @@ class MainActivity : AppCompatActivity() {
         val data = store.load()
         packNameInput.setText(data.name)
         creatorInput.setText(data.publisher)
+        hideNameCheck.isChecked = data.hideName
+        hideCreatorCheck.isChecked = data.hidePublisher
+        packNameInput.isEnabled = !data.hideName
+        creatorInput.isEnabled = !data.hidePublisher
+        hideNameCheck.setOnCheckedChangeListener { _, checked -> packNameInput.isEnabled = !checked }
+        hideCreatorCheck.setOnCheckedChangeListener { _, checked -> creatorInput.isEnabled = !checked }
 
         addStickerButton.setOnClickListener { onAddStickerClicked() }
         addToWhatsAppButton.setOnClickListener { addToWhatsApp() }
@@ -83,7 +94,9 @@ class MainActivity : AppCompatActivity() {
     private fun saveInfo() {
         store.saveInfo(
             packNameInput.text?.toString().orEmpty().trim(),
-            creatorInput.text?.toString().orEmpty().trim()
+            creatorInput.text?.toString().orEmpty().trim(),
+            hideNameCheck.isChecked,
+            hideCreatorCheck.isChecked
         )
     }
 
@@ -93,8 +106,7 @@ class MainActivity : AppCompatActivity() {
         countText.text = getString(
             R.string.count_format,
             data.stickers.size,
-            StickerStore.MAX_STICKERS,
-            StickerStore.MIN_STICKERS
+            StickerStore.MAX_STICKERS
         )
         emptyText.visibility = if (data.stickers.isEmpty()) View.VISIBLE else View.GONE
     }
@@ -195,25 +207,25 @@ class MainActivity : AppCompatActivity() {
         saveInfo()
         val data = store.load()
 
-        if (data.name.isBlank()) {
+        if (data.name.isBlank() && !data.hideName) {
             toast(getString(R.string.err_name))
             packNameInput.requestFocus()
             return
         }
-        if (data.publisher.isBlank()) {
+        if (data.publisher.isBlank() && !data.hidePublisher) {
             toast(getString(R.string.err_creator))
             creatorInput.requestFocus()
             return
         }
-        if (data.stickers.size < StickerStore.MIN_STICKERS) {
-            toast(getString(R.string.err_min, StickerStore.MIN_STICKERS))
+        if (data.stickers.isEmpty()) {
+            toast(getString(R.string.err_min))
             return
         }
 
         val intent = Intent(ACTION_ENABLE_STICKER_PACK).apply {
             putExtra("sticker_pack_id", StickerStore.PACK_ID)
             putExtra("sticker_pack_authority", StickerStore.authority(this@MainActivity))
-            putExtra("sticker_pack_name", data.name)
+            putExtra("sticker_pack_name", data.shownName)
         }
         try {
             whatsappLauncher.launch(intent)

@@ -6,14 +6,14 @@
     <string name="helper_creator">É o nome que aparece no WhatsApp como autor do pacote</string>
     <string name="add_sticker">Adicionar figurinha</string>
     <string name="add_to_whatsapp">Adicionar ao WhatsApp</string>
-    <string name="count_format">%1$d/%2$d figurinhas · mínimo %3$d</string>
+    <string name="count_format">%1$d/%2$d figurinhas</string>
     <string name="empty_hint">Toque em “Adicionar figurinha” e escolha uma foto</string>
     <string name="remove_title">Remover esta figurinha?</string>
     <string name="remove_confirm">Remover</string>
     <string name="cancel">Cancelar</string>
     <string name="err_name">Dê um nome ao pacote.</string>
     <string name="err_creator">Escolha o nome do criador.</string>
-    <string name="err_min">Adicione pelo menos %1$d figurinhas.</string>
+    <string name="err_min">Adicione pelo menos uma figurinha.</string>
     <string name="err_max">O limite é de %1$d figurinhas por pacote.</string>
     <string name="err_process">Não foi possível criar a figurinha.</string>
     <string name="err_whatsapp_missing">WhatsApp não encontrado ou desatualizado.</string>
@@ -24,4 +24,6 @@
     <string name="crash_title">O app fechou por causa de um erro</string>
     <string name="crash_copy">Copiar erro</string>
     <string name="crash_copied">Erro copiado.</string>
+    <string name="hide_pack_name">Deixar o nome do pacote invisível</string>
+    <string name="hide_creator">Deixar o nome do criador invisível</string>
 </resources>

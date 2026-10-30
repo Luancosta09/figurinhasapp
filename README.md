@@ -5,10 +5,11 @@ App Android para criar pacotes de figurinhas e adicioná-los ao WhatsApp.
 ## O que ele faz
 
 - Você escolhe o **nome do pacote** e o **nome do criador** (aparece no WhatsApp como autor).
+- Dá para deixar o nome do pacote e/ou o do criador **invisíveis** (marcando a caixa embaixo do campo).
 - Escolhe uma foto da galeria e ela vira figurinha na hora, inteira e sem recorte (centralizada num quadrado com fundo transparente).
 - O app converte para o formato do WhatsApp: WebP 512x512, abaixo de 100 KB.
 - O ícone do pacote (96x96) é feito automaticamente a partir da primeira figurinha.
-- O botão **Adicionar ao WhatsApp** envia o pacote (mínimo 3, máximo 30 figurinhas).
+- O botão **Adicionar ao WhatsApp** envia o pacote (de 1 a 30 figurinhas). O WhatsApp exige 3 no mínimo, então com 1 ou 2 o app repete as suas até completar 3 só no envio.
 - Funciona com WhatsApp e WhatsApp Business.
 
 ## Como gerar o APK (sem PC, pelo GitHub)

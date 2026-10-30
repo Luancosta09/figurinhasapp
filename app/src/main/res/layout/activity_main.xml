@@ -27,6 +27,12 @@
             android:maxLength="60"
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/hidePackNameCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hide_pack_name" />
+
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -44,6 +50,12 @@
             android:maxLength="60"
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/hideCreatorCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hide_creator" />
+
 
     <TextView
         android:id="@+id/countText"

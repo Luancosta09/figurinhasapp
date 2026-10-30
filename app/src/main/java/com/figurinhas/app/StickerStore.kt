@@ -7,12 +7,21 @@ import java.io.File
 
 data class Sticker(val file: String, val emoji: String)
 
+/** Caractere "Braille em branco": ocupa espaço mas não aparece, e o WhatsApp não o considera vazio. */
+const val INVISIBLE_TEXT = "\u2800"
+
 data class PackData(
     val name: String,
     val publisher: String,
     val version: Int,
-    val stickers: List<Sticker>
-)
+    val stickers: List<Sticker>,
+    val hideName: Boolean = false,
+    val hidePublisher: Boolean = false
+) {
+    /** Nome que vai para o WhatsApp. */
+    val shownName: String get() = if (hideName) INVISIBLE_TEXT else name
+    val shownPublisher: String get() = if (hidePublisher) INVISIBLE_TEXT else publisher
+}
 
 /**
  * Guarda o pacote (nome, criador e figurinhas) na pasta interna do app.
@@ -25,9 +34,16 @@ class StickerStore(context: Context) {
 
     fun load(): PackData = synchronized(LOCK) { read() }
 
-    fun saveInfo(name: String, publisher: String) {
+    fun saveInfo(name: String, publisher: String, hideName: Boolean, hidePublisher: Boolean) {
         synchronized(LOCK) {
-            write(read().copy(name = name, publisher = publisher))
+            write(
+                read().copy(
+                    name = name,
+                    publisher = publisher,
+                    hideName = hideName,
+                    hidePublisher = hidePublisher
+                )
+            )
         }
     }
 
@@ -55,8 +71,26 @@ class StickerStore(context: Context) {
         }
     }
 
+    /**
+     * Lista enviada ao WhatsApp. Ele exige no mínimo 3 figurinhas por pacote; se houver menos,
+     * as suas são repetidas (nomes "dupN_...") só nessa lista, sem aparecer na tela do app.
+     */
+    fun stickersForWhatsApp(): List<Sticker> {
+        val list = load().stickers
+        if (list.isEmpty() || list.size >= MIN_STICKERS) return list
+        val out = list.toMutableList()
+        var i = 0
+        while (out.size < MIN_STICKERS) {
+            val base = list[i % list.size]
+            out.add(Sticker("dup${out.size}_${base.file}", base.emoji))
+            i++
+        }
+        return out
+    }
+
     /** Devolve o arquivo de uma figurinha (ou do ícone) se o nome for seguro e existir. */
-    fun fileFor(name: String): File? {
+    fun fileFor(rawName: String): File? {
+        val name = rawName.replace(DUP_PREFIX, "")
         if (name.isEmpty() || name.contains('/') || name.contains('\\') || name.contains("..")) {
             return null
         }
@@ -88,7 +122,9 @@ class StickerStore(context: Context) {
                 name = obj.optString("name"),
                 publisher = obj.optString("publisher"),
                 version = obj.optInt("version", 1),
-                stickers = list
+                stickers = list,
+                hideName = obj.optBoolean("hideName", false),
+                hidePublisher = obj.optBoolean("hidePublisher", false)
             )
         } catch (e: Exception) {
             EMPTY
@@ -104,6 +140,8 @@ class StickerStore(context: Context) {
             .put("name", data.name)
             .put("publisher", data.publisher)
             .put("version", data.version)
+            .put("hideName", data.hideName)
+            .put("hidePublisher", data.hidePublisher)
             .put("stickers", arr)
             .toString()
         val tmp = File(dir, "pack.json.tmp")
@@ -121,6 +159,7 @@ class StickerStore(context: Context) {
         const val MAX_STICKERS = 30
         const val DEFAULT_EMOJI = "😀"
 
+        private val DUP_PREFIX = Regex("^dup\\d+_")
         private val LOCK = Any()
         private val EMPTY = PackData("", "", 1, emptyList())
 

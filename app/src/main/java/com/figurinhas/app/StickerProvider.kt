@@ -65,8 +65,8 @@ class StickerProvider : ContentProvider() {
             cursor.addRow(
                 arrayOf<Any>(
                     StickerStore.PACK_ID,
-                    data.name,
-                    data.publisher,
+                    data.shownName,
+                    data.shownPublisher,
                     StickerStore.TRAY_FILE,
                     "",
                     "",
@@ -89,7 +89,7 @@ class StickerProvider : ContentProvider() {
             arrayOf("sticker_file_name", "sticker_emoji", "sticker_accessibility_text")
         )
         if (uri.lastPathSegment == StickerStore.PACK_ID) {
-            StickerStore(context!!).load().stickers.forEach {
+            StickerStore(context!!).stickersForWhatsApp().forEach {
                 cursor.addRow(arrayOf<Any>(it.file, it.emoji, "Figurinha"))
             }
         }
