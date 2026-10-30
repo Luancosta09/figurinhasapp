@@ -30,23 +30,15 @@ object ImageUtils {
             Bitmap.CompressFormat.WEBP
         }
 
-    /** Lê a imagem inteira (sem cortar) e devolve os bytes de um WebP 512x512 com menos de 100 KB. */
+    /** Lê a imagem inteira (sem cortar), estica para 512x512 e devolve os bytes de um WebP 512x512 com menos de 100 KB. */
     fun toStickerWebp(source: File): ByteArray {
         val src = loadOriented(source.absolutePath, 1536)
 
         val canvasBitmap = Bitmap.createBitmap(STICKER_SIZE, STICKER_SIZE, Bitmap.Config.ARGB_8888)
         try {
             val canvas = Canvas(canvasBitmap)
-            val scale = minOf(
-                STICKER_SIZE.toFloat() / src.width,
-                STICKER_SIZE.toFloat() / src.height
-            )
-            val w = src.width * scale
-            val h = src.height * scale
-            val left = (STICKER_SIZE - w) / 2f
-            val top = (STICKER_SIZE - h) / 2f
             val paint = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
-            canvas.drawBitmap(src, null, RectF(left, top, left + w, top + h), paint)
+            canvas.drawBitmap(src, null, RectF(0f, 0f, STICKER_SIZE.toFloat(), STICKER_SIZE.toFloat()), paint)
         } finally {
             src.recycle()
         }
